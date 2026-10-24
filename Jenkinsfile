@@ -1,0 +1,32 @@
+node {
+  def appDir = "/var/www/nextjs-app"
+
+  stage("Clear Workspace"){
+    echo "Cleaning Jenkins"
+    deleteDir()
+  }
+
+  stage("Clone Repo"){
+    echo "Cloning the Repo"
+    git {
+      branch : "main",
+      url : "https://github.com/abdullah-sysconinfotech/Jenkins-EC2-Deploy"
+    }
+  }
+
+  stage("Deploy to EC2"){
+    echo "Deploying to EC2"
+     sh """
+      sudo mkdir -p ${appDir}
+      sudo chown -r jenkins:jenkins ${appDir}
+
+      rsync -av --delete --exclude='.git' --exclude='node_modules' ./${appDir}
+
+      cd ${appDir}
+      sudo npm install
+      sudo npm run build
+      sudo fuser -k 3000/tcp || ture
+      npm run start
+     """
+  }
+}
