@@ -18,14 +18,17 @@ node {
     echo "Deploying to EC2"
      sh """
       sudo mkdir -p ${appDir}
-      sudo chown -r jenkins:jenkins ${appDir}
+      sudo chown -R jenkins:jenkins ${appDir}
 
-      rsync -av --delete --exclude='.git' --exclude='node_modules' ./${appDir}
+      rsync -av --delete
+       --exclude='.git' 
+       --exclude='node_modules' 
+       ./ ${appDir}/
 
       cd ${appDir}
       sudo npm install
       sudo npm run build
-      sudo fuser -k 3000/tcp || ture
+      sudo fuser -k 3000/tcp || true
       npm run start
      """
   }
